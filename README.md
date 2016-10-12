@@ -53,11 +53,14 @@ the readability quite a bit.
 
 ## Usage
 
+The library is still in pre-release stage. If you are feeling adventurous, snapshots are available
+on [Sonatype OSS artifactory](https://oss.sonatype.org/content/groups/public/).
+
 The easiest way to add the required dependency is by using Gradle:
 
 ```gradle
 repositories {
-    jcenter()
+    maven { url 'https://oss.sonatype.org/content/groups/public' }
 }
 
 dependencies {
@@ -73,6 +76,18 @@ Or Maven:
     <artifactId>permiscus</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
+```
+```xml
+<repositories>
+
+    <!-- other repositories here -->
+
+    <repository>
+        <id>oss-sonatype</id>
+        <name>OSS Sonatype Repository</name>
+        <url>https://oss.sonatype.org/content/groups/public/</url>
+    </repository>
+</repositories>
 ```
 
 Alternatively, you can also clone the git repository and include the library in your 
@@ -177,7 +192,7 @@ public interface OnPermissionGrantedCallback {
 }
 
 public interface OnPermissionDeniedCallback {
-    void onPermissionDenied();
+    void onPermissionDenied(boolean neverAskAgain);
 }
 
 public interface OnPermissionShowRationaleCallback {
