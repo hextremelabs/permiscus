@@ -1,4 +1,4 @@
-# android-permission-manager
+# permiscus
 
 Android runtime permissions were introduced in Android 6.0 Marshmallow. They are unquestionably 
 a boon for Android users, but can be a pain for developers. 
@@ -61,7 +61,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.buchandersenn:android-permission-manager:1.0.0'
+    compile 'com.hextremelabs.permiscus:permiscus:1.0-SNAPSHOT'
 }
 ```
 
@@ -69,9 +69,9 @@ Or Maven:
 
 ```xml
 <dependency>
-    <groupId>com.github.buchandersenn</groupId>
-    <artifactId>android-permission-manager</artifactId>
-    <version>1.0.0</version>
+    <groupId>com.hextremelabs.permiscus</groupId>
+    <artifactId>permiscus</artifactId>
+    <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -229,9 +229,9 @@ appropriately named factory method. By static importing these methods the code c
 be streamlined further, as shown in the initial example:
 
 ```java
-import static com.github.buchandersenn.android_permission_manager.callbacks.PermissionCallbacks.showPermissionDeniedSnackbar;
-import static com.github.buchandersenn.android_permission_manager.callbacks.PermissionCallbacks.showPermissionShowRationaleSnackbar;
-import static com.github.buchandersenn.android_permission_manager.callbacks.PermissionCallbacks.startPermissionGrantedActivity;
+import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.showPermissionDeniedSnackbar;
+import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.showPermissionShowRationaleSnackbar;
+import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.startPermissionGrantedActivity;
 
 ...
 
@@ -318,13 +318,17 @@ requesting a permission. For example:
 
 ## Author
 
+Kingsley Adio<br/>
+Email: <kingsley@hextremelabs.com><br/>
+
+<h3>Originally maintained by:</h3>
 Nicolai Buch-Andersen<br/>
 Google+ <https://google.com/+NicolaiBuchAndersen><br/>
 Email: <nicolai.buch.andersen@gmail.com><br/>
 
 ## License
 
-    Copyright 2015 Nicolai Buch-Andersen
+    Copyright 2016 Hextremelabs Ltd.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

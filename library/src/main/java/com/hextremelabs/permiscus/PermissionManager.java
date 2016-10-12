@@ -1,4 +1,4 @@
-package com.github.buchandersenn.android_permission_manager;
+package com.hextremelabs.permiscus;
 
 import android.app.Activity;
 import android.app.Fragment;

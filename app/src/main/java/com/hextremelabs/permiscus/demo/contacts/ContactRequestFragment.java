@@ -1,4 +1,4 @@
-package com.github.buchandersenn.android_permission_manager.demo.contacts;
+package com.hextremelabs.permiscus.demo.contacts;
 
 import android.Manifest;
 import android.app.Fragment;
@@ -11,14 +11,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.github.buchandersenn.android_permission_manager.PermissionManager;
-import com.github.buchandersenn.android_permission_manager.demo.R;
+import com.hextremelabs.permiscus.PermissionManager;
+import com.hextremelabs.permiscus.demo.R;
 
-import static com.github.buchandersenn.android_permission_manager.callbacks.PermissionCallbacks.doAll;
-import static com.github.buchandersenn.android_permission_manager.callbacks.PermissionCallbacks.setPermissionDeniedViewEnabled;
-import static com.github.buchandersenn.android_permission_manager.callbacks.PermissionCallbacks.setPermissionDeniedViewVisibility;
-import static com.github.buchandersenn.android_permission_manager.callbacks.PermissionCallbacks.showPermissionGrantedFragment;
-import static com.github.buchandersenn.android_permission_manager.callbacks.PermissionCallbacks.showPermissionRationaleFragment;
+import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.doAll;
+import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.setPermissionDeniedViewEnabled;
+import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.setPermissionDeniedViewVisibility;
+import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.showPermissionGrantedFragment;
+import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.showPermissionRationaleFragment;
 
 public class ContactRequestFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback {
     private final PermissionManager permissionManager = PermissionManager.create(this);

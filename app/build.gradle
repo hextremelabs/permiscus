@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 dependencies {
-    //compile 'com.github.buchandersenn:android-permission-manager:1.0.0'
-    compile project(":android-permission-manager")
+    //compile 'com.hextremelabs.permiscus:permiscus:1.0.0'
+    compile project(":permiscus")
     compile libraries.support_annotations
     compile libraries.support_appcompat
     compile libraries.support_design
@@ -13,6 +13,7 @@ android {
     buildToolsVersion versions.buildToolsVersion
 
     defaultConfig {
+        applicationId 'com.hextremelabs.permiscus.demo'
         minSdkVersion versions.minSdkVersion
         targetSdkVersion versions.targetSdkVersion
 

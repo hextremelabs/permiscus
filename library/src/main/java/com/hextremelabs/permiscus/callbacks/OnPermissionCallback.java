@@ -1,4 +1,4 @@
-package com.github.buchandersenn.android_permission_manager.callbacks;
+package com.hextremelabs.permiscus.callbacks;
 
 public interface OnPermissionCallback extends OnPermissionGrantedCallback, OnPermissionDeniedCallback, OnPermissionShowRationaleCallback {
 }

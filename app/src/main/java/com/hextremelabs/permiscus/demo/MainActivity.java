@@ -1,4 +1,4 @@
-package com.github.buchandersenn.android_permission_manager.demo;
+package com.hextremelabs.permiscus.demo;
 
 import android.Manifest;
 import android.app.FragmentTransaction;
@@ -14,11 +14,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import com.github.buchandersenn.android_permission_manager.PermissionManager;
-import com.github.buchandersenn.android_permission_manager.PermissionRequest;
-import com.github.buchandersenn.android_permission_manager.callbacks.OnPermissionCallback;
-import com.github.buchandersenn.android_permission_manager.demo.camera.CameraPreviewActivity;
-import com.github.buchandersenn.android_permission_manager.demo.contacts.ContactRequestFragment;
+import com.hextremelabs.permiscus.PermissionManager;
+import com.hextremelabs.permiscus.PermissionRequest;
+import com.hextremelabs.permiscus.callbacks.OnPermissionCallback;
+import com.hextremelabs.permiscus.demo.camera.CameraPreviewActivity;
+import com.hextremelabs.permiscus.demo.contacts.ContactRequestFragment;
 
 public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         mLayout = findViewById(R.id.main_layout);
 
         // Register a listener for the 'Show Camera Preview' button...
-        Button b = (Button) findViewById(com.github.buchandersenn.android_permission_manager.demo.R.id.button_open_camera);
+        Button b = (Button) findViewById(com.hextremelabs.permiscus.demo.R.id.button_open_camera);
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -82,9 +82,9 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
         // Handling all three callbacks using a single custom handler...
         permissionManager.with(Manifest.permission.CAMERA)
-                .usingRequestCode(PERMISSION_REQUEST_CAMERA)
-                .onCallback(new CameraPermissionCallback())
-                .request();
+          .usingRequestCode(PERMISSION_REQUEST_CAMERA)
+          .onCallback(new CameraPermissionCallback())
+          .request();
     }
 
     private class CameraPermissionCallback implements OnPermissionCallback {
@@ -109,8 +109,8 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             };
 
             Snackbar.make(mLayout, "Camera access is required to display the camera preview.", Snackbar.LENGTH_INDEFINITE)
-                    .setAction("OK", okClickListener)
-                    .show();
+              .setAction("OK", okClickListener)
+              .show();
         }
     }
 }

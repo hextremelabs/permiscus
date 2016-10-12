@@ -1,10 +1,10 @@
-package com.github.buchandersenn.android_permission_manager;
+package com.hextremelabs.permiscus;
 
 import android.support.annotation.NonNull;
 
-import com.github.buchandersenn.android_permission_manager.callbacks.OnPermissionDeniedCallback;
-import com.github.buchandersenn.android_permission_manager.callbacks.OnPermissionGrantedCallback;
-import com.github.buchandersenn.android_permission_manager.callbacks.OnPermissionShowRationaleCallback;
+import com.hextremelabs.permiscus.callbacks.OnPermissionDeniedCallback;
+import com.hextremelabs.permiscus.callbacks.OnPermissionGrantedCallback;
+import com.hextremelabs.permiscus.callbacks.OnPermissionShowRationaleCallback;
 
 public class PermissionRequest {
     private final @NonNull PermissionManager permissionManager;

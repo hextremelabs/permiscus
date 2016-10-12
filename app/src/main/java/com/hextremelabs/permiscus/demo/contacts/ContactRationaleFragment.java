@@ -1,4 +1,4 @@
-package com.github.buchandersenn.android_permission_manager.demo.contacts;
+package com.hextremelabs.permiscus.demo.contacts;
 
 import android.Manifest;
 import android.app.Fragment;
@@ -12,13 +12,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.github.buchandersenn.android_permission_manager.PermissionManager;
-import com.github.buchandersenn.android_permission_manager.PermissionRequest;
-import com.github.buchandersenn.android_permission_manager.callbacks.OnPermissionShowRationaleCallback;
-import com.github.buchandersenn.android_permission_manager.demo.R;
+import com.hextremelabs.permiscus.PermissionManager;
+import com.hextremelabs.permiscus.PermissionRequest;
+import com.hextremelabs.permiscus.callbacks.OnPermissionShowRationaleCallback;
+import com.hextremelabs.permiscus.demo.R;
 
-import static com.github.buchandersenn.android_permission_manager.callbacks.PermissionCallbacks.showPermissionDeniedFragment;
-import static com.github.buchandersenn.android_permission_manager.callbacks.PermissionCallbacks.showPermissionGrantedFragment;
+import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.showPermissionDeniedFragment;
+import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.showPermissionGrantedFragment;
 
 public class ContactRationaleFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback {
     private final PermissionManager permissionManager = PermissionManager.create(this);

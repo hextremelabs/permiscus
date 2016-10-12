@@ -1,4 +1,4 @@
-package com.github.buchandersenn.android_permission_manager.demo.contacts;
+package com.hextremelabs.permiscus.demo.contacts;
 
 import android.app.Fragment;
 import android.app.LoaderManager;
@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.github.buchandersenn.android_permission_manager.demo.R;
+import com.hextremelabs.permiscus.demo.R;
 
 public class ContactResultFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     /**

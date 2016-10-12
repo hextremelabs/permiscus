@@ -1,4 +1,4 @@
-package com.github.buchandersenn.android_permission_manager.demo.camera;
+package com.hextremelabs.permiscus.demo.camera;
 
 import android.app.Activity;
 import android.hardware.Camera;
@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.github.buchandersenn.android_permission_manager.demo.R;
+import com.hextremelabs.permiscus.demo.R;
 
 /**
  * Displays a {@link CameraPreview} of the first {@link Camera}.

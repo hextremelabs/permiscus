@@ -1,4 +1,4 @@
-package com.github.buchandersenn.android_permission_manager.demo.camera;
+package com.hextremelabs.permiscus.demo.camera;
 
 import android.content.Context;
 import android.hardware.Camera;

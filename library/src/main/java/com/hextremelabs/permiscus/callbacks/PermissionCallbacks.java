@@ -1,4 +1,4 @@
-package com.github.buchandersenn.android_permission_manager.callbacks;
+package com.hextremelabs.permiscus.callbacks;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -13,7 +13,7 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
-import com.github.buchandersenn.android_permission_manager.PermissionRequest;
+import com.hextremelabs.permiscus.PermissionRequest;
 
 public class PermissionCallbacks {
 
