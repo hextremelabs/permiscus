@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="proceed">Proceed</string>
+    <string name="permissions_disabled">The permissions required for this feature have been disabled</string>
+    <string name="permissions_denied">The permissions required for this feature were not granted</string>
+    <string name="change_settings">Change Settings</string>
+</resources>
