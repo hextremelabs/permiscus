@@ -50,20 +50,24 @@ artifacts {
     archives sourcesJar
 }
 
-//noinspection UnnecessaryQualifiedReference
-@groovy.transform.Field def props = new Properties()
-props.load(rootProject.file('local.properties').newDataInputStream())
+def localProperties = new Properties()
+def localFile = rootProject.file("local.properties")
+if (localFile.exists()) {
+    localProperties.load(localFile.newDataInputStream())
+}
 
-def prop(String key) {
-    if (props.containsKey(key)) return props.getProperty(key)
-    else return System.getenv(key.replace('.', '_'))
+def props = { propName, defaultValue = "" ->
+    def local = localProperties.containsKey(propName)
+
+    if (local) return localProperties.getProperty(propName)
+    else return System.getenv(propName) ?: defaultValue
 }
 
 uploadArchives {
     // Authentication
-    def username = prop("nexus.username")
-    def password = prop("nexus.password")
-    def repositoryUrl = prop("nexus.repository")
+    def username = props("nexus.username")
+    def password = props("nexus.password")
+    def repositoryUrl = props("nexus.repository")
 
     println "Project: $project.path"
     println "Username: $username"
