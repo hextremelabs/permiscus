@@ -14,11 +14,8 @@ import android.widget.Button;
 
 import com.hextremelabs.permiscus.PermissionManager;
 import com.hextremelabs.permiscus.PermissionRequest;
-import com.hextremelabs.permiscus.callbacks.OnPermissionShowRationaleCallback;
+import com.hextremelabs.permiscus.callbacks.OnPermissionCallback;
 import com.hextremelabs.permiscus.demo.R;
-
-import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.showPermissionDeniedFragment;
-import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.showPermissionGrantedFragment;
 
 public class ContactRationaleFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback {
     private final PermissionManager permissionManager = PermissionManager.create(this);
@@ -62,15 +59,29 @@ public class ContactRationaleFragment extends Fragment implements FragmentCompat
 
     private void onOk() {
         permissionManager.with(Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS)
-            .onPermissionGranted(showPermissionGrantedFragment(getFragmentManager(), R.id.fragment_container, new ContactResultFragment(), false))
-            .onPermissionDenied(showPermissionDeniedFragment(getFragmentManager(), R.id.fragment_container, new ContactRequestFragment(), false))
-            .onPermissionShowRationale(new OnPermissionShowRationaleCallback() {
-                @Override
-                public void onPermissionShowRationale(PermissionRequest permissionRequest) {
-                    // The rationale is already showing, go ahead and request the permission...
-                    permissionRequest.acceptPermissionRationale();
-                }
-            })
-            .request();
+          .onCallback(new PermissionsCallback())
+          .request();
+    }
+
+    private class PermissionsCallback implements OnPermissionCallback {
+
+        @Override
+        public void onPermissionDenied(boolean neverAskAgain) {
+            getFragmentManager().beginTransaction()
+              .replace(R.id.fragment_container, new ContactRequestFragment())
+              .commit();
+        }
+
+        @Override
+        public void onPermissionGranted() {
+            getFragmentManager().beginTransaction()
+              .replace(R.id.fragment_container, new ContactResultFragment())
+              .commit();
+        }
+
+        @Override
+        public void onPermissionShowRationale(PermissionRequest permissionRequest) {
+            permissionRequest.acceptPermissionRationale();
+        }
     }
 }

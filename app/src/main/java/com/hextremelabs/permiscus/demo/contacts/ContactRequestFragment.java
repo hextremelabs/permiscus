@@ -12,13 +12,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.hextremelabs.permiscus.PermissionManager;
+import com.hextremelabs.permiscus.PermissionRequest;
+import com.hextremelabs.permiscus.callbacks.OnPermissionCallback;
 import com.hextremelabs.permiscus.demo.R;
-
-import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.doAll;
-import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.setPermissionDeniedViewEnabled;
-import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.setPermissionDeniedViewVisibility;
-import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.showPermissionGrantedFragment;
-import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.showPermissionRationaleFragment;
 
 public class ContactRequestFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback {
     private final PermissionManager permissionManager = PermissionManager.create(this);
@@ -34,7 +30,7 @@ public class ContactRequestFragment extends Fragment implements FragmentCompat.O
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        contactsButton  = (Button) view.findViewById(R.id.button_open_contacts);
+        contactsButton = (Button) view.findViewById(R.id.button_open_contacts);
         contactsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -51,11 +47,30 @@ public class ContactRequestFragment extends Fragment implements FragmentCompat.O
 
     private void showContacts() {
         permissionManager.with(Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS)
-                .onPermissionGranted(showPermissionGrantedFragment(getFragmentManager(), R.id.fragment_container, new ContactResultFragment(), false))
-                .onPermissionShowRationale(showPermissionRationaleFragment(getFragmentManager(), R.id.fragment_container, new ContactRationaleFragment(), false))
-                .onPermissionDenied(doAll(
-                        setPermissionDeniedViewVisibility(contactsDeniedView, View.VISIBLE),
-                        setPermissionDeniedViewEnabled(contactsButton, false)))
-                .request();
+          .onCallback(new PermissionsCallback())
+          .request();
+    }
+
+    private class PermissionsCallback implements OnPermissionCallback {
+
+        @Override
+        public void onPermissionDenied(boolean neverAskAgain) {
+            contactsDeniedView.setVisibility(View.VISIBLE);
+            contactsButton.setEnabled(false);
+        }
+
+        @Override
+        public void onPermissionGranted() {
+            getFragmentManager().beginTransaction()
+              .replace(R.id.fragment_container, new ContactResultFragment())
+              .commit();
+        }
+
+        @Override
+        public void onPermissionShowRationale(PermissionRequest permissionRequest) {
+            getFragmentManager().beginTransaction()
+              .replace(R.id.fragment_container, new ContactRationaleFragment())
+              .commit();
+        }
     }
 }

@@ -5,7 +5,6 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -15,8 +14,9 @@ import android.view.View;
 import android.widget.Button;
 
 import com.hextremelabs.permiscus.PermissionManager;
-import com.hextremelabs.permiscus.PermissionRequest;
 import com.hextremelabs.permiscus.callbacks.OnPermissionCallback;
+import com.hextremelabs.permiscus.callbacks.OnPermissionGrantedCallback;
+import com.hextremelabs.permiscus.callbacks.SimplePermissionCallback;
 import com.hextremelabs.permiscus.demo.camera.CameraPreviewActivity;
 import com.hextremelabs.permiscus.demo.contacts.ContactRequestFragment;
 
@@ -73,44 +73,24 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     }
 
     private void showCameraPreview() {
-        // Handling the callbacks using the helper methods in the library...
-        // permissionManager.with(Manifest.permission.CAMERA)
-        //         .onPermissionGranted(startPermissionGrantedActivity(this, new Intent(this, CameraPreviewActivity.class)))
-        //         .onPermissionDenied(showPermissionDeniedSnackbar(mLayout, "Camera permission request was denied.", "SETTINGS"))
-        //         .onPermissionShowRationale(showPermissionShowRationaleSnackbar(mLayout, "Camera access is required to display the camera preview.", "OK"))
-        //         .request();
+        OnPermissionCallback callback = SimplePermissionCallback.with(mLayout)
+          .rationale("Camera permission is required to take your pictures")
+          .instructions("Open permissions and tap on Camera to enable it")
+          .onPermissionsGranted(new CameraPermissionGrantedCallback())
+          .create();
 
-        // Handling all three callbacks using a single custom handler...
         permissionManager.with(Manifest.permission.CAMERA)
           .usingRequestCode(PERMISSION_REQUEST_CAMERA)
-          .onCallback(new CameraPermissionCallback())
+          .onCallback(callback)
           .request();
     }
 
-    private class CameraPermissionCallback implements OnPermissionCallback {
+    private class CameraPermissionGrantedCallback implements OnPermissionGrantedCallback {
+
         @Override
         public void onPermissionGranted() {
             Intent intent = new Intent(MainActivity.this, CameraPreviewActivity.class);
             startActivity(intent);
-        }
-
-        @Override
-        public void onPermissionDenied(boolean neverAskAgain) {
-            Snackbar.make(mLayout, "Camera permission request was denied.", Snackbar.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onPermissionShowRationale(final PermissionRequest permissionRequest) {
-            View.OnClickListener okClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    permissionRequest.acceptPermissionRationale();
-                }
-            };
-
-            Snackbar.make(mLayout, "Camera access is required to display the camera preview.", Snackbar.LENGTH_INDEFINITE)
-              .setAction("OK", okClickListener)
-              .show();
         }
     }
 }
