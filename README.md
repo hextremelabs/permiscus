@@ -80,7 +80,7 @@ Maven
 [Download Latest AAR](https://search.maven.org/remote_content?g=com.hextremelabs.permiscus&a=permiscus&v=LATEST&e=aar)
 
 Snapshots of developement versions are available 
-on [Sonatype snapshots repository](https://oss.sonatype.org/content/groups/public/com/hextremelabs/permiscus/permiscus/)
+on [Sonatype snapshots repository](https://oss.sonatype.org/content/groups/public/)
 
 ### Creating a PermissionManager
 
