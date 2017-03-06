@@ -9,9 +9,9 @@ The app therefore need to check for permissions each time it wants to perform an
 requires a permission, and to ask the user to grant the permission if the app does not already 
 posses it.
 
-This is somewhat cumbersome and requires a great deal of boilerplate code. The library can simplify
-this, allowing the developer to focus on the actual app functionality instead of Android 
-technicalities.
+This is somewhat cumbersome and requires a great deal of boilerplate code. The library aims at
+removing complexities and making permissions request fun again, allowing the developer to 
+focus on the actual app functionality instead of Android technicalities.
 
 ### Example
 
@@ -26,10 +26,7 @@ of code, almost all dealing with the single permission request.
 [Take a look at the code here](https://github.com/googlesamples/android-RuntimePermissionsBasic/blob/master/Application/src/main/java/com/example/android/basicpermissions/MainActivity.java)
 
 
-This library reduces the complexity by handling the whole mundane and repetitive 
-check-permission/show-rationale/request-permission/evaluate-result/perform-operation flow 
-behind the scenes. Using the PermissionManager and some of the helper methods included 
-in the library, you can achieve all of the above with the following few lines of code:
+The same operation using this library is as simple as:
 
 ```java
 private final PermissionManager permissionManager = PermissionManager.create(this);
@@ -38,7 +35,12 @@ private void showCameraPreview() {
     OnPermissionCallback callback = SimplePermissionCallback.with(mLayout)
       .rationale("Camera permission is required to take your pictures")
       .instructions("Open permissions and tap on Camera to enable it")
-      .onPermissionsGranted(new CameraPermissionGrantedCallback())
+      .onPermissionsGranted(new OnPermissionGrantedCallback {
+            @Override
+            public void onPermissionGranted() {
+                startActivity(new Intent(this, CameraPreviewActivity.class));
+            }
+        })
       .create();
 
     permissionManager.with(Manifest.permission.CAMERA)
@@ -53,27 +55,20 @@ public void onRequestPermissionsResult(int requestCode, @NonNull String[] permis
 }
 ```
 
-The library not only reduces the amount of code by about half, but also greatly improves readability.
+This not only reduces the amount of code by about half, but also greatly improves readability.
 
 ## Usage
 
-The library is still in pre-release stage. If you are feeling adventurous, you can pick up the latest build
-on [Sonatype OSS artifactory](https://oss.sonatype.org/content/groups/public/).
+### Download
 
-The easiest way to add the required dependency is by using Gradle:
-
+Gradle
 ```gradle
-repositories {
-    maven { url 'https://oss.sonatype.org/content/groups/public' }
-}
-
 dependencies {
     compile 'com.hextremelabs.permiscus:permiscus:0.1.0'
 }
 ```
 
-Or Maven:
-
+Maven
 ```xml
 <dependency>
     <groupId>com.hextremelabs.permiscus</groupId>
@@ -81,21 +76,11 @@ Or Maven:
     <version>0.1.0</version>
 </dependency>
 ```
-```xml
-<repositories>
 
-    <!-- other repositories here -->
+[Download Latest JAR](https://search.maven.org/remote_content?g=com.hextremelabs.permiscus&a=permiscus&v=LATEST)
 
-    <repository>
-        <id>oss-sonatype</id>
-        <name>OSS Sonatype Repository</name>
-        <url>https://oss.sonatype.org/content/groups/public/</url>
-    </repository>
-</repositories>
-```
-
-Alternatively, you can also clone the git repository and include the library in your 
-project manually.
+Snapshots of developement versions are available 
+on [Sonatype snapshots repository](https://oss.sonatype.org/content/groups/public/)
 
 ### Creating a PermissionManager
 
