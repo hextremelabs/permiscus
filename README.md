@@ -22,9 +22,9 @@ the result of the request and finally launching a camera preview activity if the
 is granted.
 
 Even stripped of JavaDoc and comments, the sample code still takes up approximately 100 lines 
-of code, almost all dealing with the single permission request. Take a look at the code here:
+of code, almost all dealing with the single permission request. 
+[Take a look at the code here](https://github.com/googlesamples/android-RuntimePermissionsBasic/blob/master/Application/src/main/java/com/example/android/basicpermissions/MainActivity.java)
 
-https://github.com/googlesamples/android-RuntimePermissionsBasic/blob/master/Application/src/main/java/com/example/android/basicpermissions/MainActivity.java
 
 This library reduces the complexity by handling the whole mundane and repetitive 
 check-permission/show-rationale/request-permission/evaluate-result/perform-operation flow 
@@ -35,11 +35,16 @@ in the library, you can achieve all of the above with the following few lines of
 private final PermissionManager permissionManager = PermissionManager.create(this);
 
 private void showCameraPreview() {
+    OnPermissionCallback callback = SimplePermissionCallback.with(mLayout)
+      .rationale("Camera permission is required to take your pictures")
+      .instructions("Open permissions and tap on Camera to enable it")
+      .onPermissionsGranted(new CameraPermissionGrantedCallback())
+      .create();
+
     permissionManager.with(Manifest.permission.CAMERA)
-            .onPermissionGranted(startPermissionGrantedActivity(this, new Intent(this, CameraPreviewActivity.class)))
-            .onPermissionDenied(showPermissionDeniedSnackbar(mLayout, "Camera permission request was denied.", "SETTINGS"))
-            .onPermissionShowRationale(showPermissionShowRationaleSnackbar(mLayout, "Camera access is required to display the camera preview.", "OK"))
-            .request();
+      .usingRequestCode(PERMISSION_REQUEST_CAMERA)
+      .onCallback(callback)
+      .request();
 }
 
 @Override
@@ -48,12 +53,11 @@ public void onRequestPermissionsResult(int requestCode, @NonNull String[] permis
 }
 ```
 
-The library not only reduces the amount of code by about half, but also improves 
-the readability quite a bit.
+The library not only reduces the amount of code by about half, but also greatly improves readability.
 
 ## Usage
 
-The library is still in pre-release stage. If you are feeling adventurous, snapshots are available
+The library is still in pre-release stage. If you are feeling adventurous, you can pick up the latest build
 on [Sonatype OSS artifactory](https://oss.sonatype.org/content/groups/public/).
 
 The easiest way to add the required dependency is by using Gradle:
@@ -64,7 +68,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.hextremelabs.permiscus:permiscus:1.0-SNAPSHOT'
+    compile 'com.hextremelabs.permiscus:permiscus:0.1.0'
 }
 ```
 
@@ -74,7 +78,7 @@ Or Maven:
 <dependency>
     <groupId>com.hextremelabs.permiscus</groupId>
     <artifactId>permiscus</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1.0</version>
 </dependency>
 ```
 ```xml
@@ -172,8 +176,8 @@ Alternatively, it is also possible to check for the permission 'silently':
 
 ```java
 permissionManager.with(...)
-        .onPermissionGranted(new OnPermissionGrantedCallback() {...})
-        .onPermissionDenied(new OnPermissionDeniedCallback() {...})
+        .onPermissionGranted(...)
+        .onPermissionDenied(...)
         .check();
 ```
 
@@ -232,48 +236,6 @@ void onPermissionShowRationale(PermissionRequest permissionRequest) {
 When the user answers the permission prompt, the onPermissionGranted or onPermissionDenied 
 callbacks are called, just as if the rationale had not been shown.
 
-### Common callbacks handlers
-
-Some callbacks handlers are common across a wide range of apps: launching a new activity 
-when a permission is granted, using a snackbar to show the permission rationale, 
-showing a fragment if the permission request is denied ect.
-
-To facilitate these common callback types the library contains a collection of common callback
-implementations in the class PermissionCallbacks. Each callback handler is wrapped in an 
-appropriately named factory method. By static importing these methods the code can 
-be streamlined further, as shown in the initial example:
-
-```java
-import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.showPermissionDeniedSnackbar;
-import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.showPermissionShowRationaleSnackbar;
-import static com.hextremelabs.permiscus.callbacks.PermissionCallbacks.startPermissionGrantedActivity;
-
-...
-
-permissionManager.with(Manifest.permission.CAMERA)
-        .onPermissionGranted(startPermissionGrantedActivity(this, new Intent(this, CameraPreviewActivity.class)))
-        .onPermissionDenied(showPermissionDeniedSnackbar(mLayout, "Camera permission request was denied.", "SETTINGS"))
-        .onPermissionShowRationale(showPermissionShowRationaleSnackbar(mLayout, "Camera access is required to display the camera preview.", "OK"))
-        .request();
-```
-
-It is even possible to chain callback handlers together using the doAll() callback handler 
-as a wrapper. Here's an example from the sample app:
-
-```java
-permissionManager.with(Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS)
-        .onPermissionGranted(showPermissionGrantedFragment(getFragmentManager(), R.id.fragment_container, new ContactResultFragment(), false))
-        .onPermissionShowRationale(showPermissionRationaleFragment(getFragmentManager(), R.id.fragment_container, new ContactRationaleFragment(), false))
-        .onPermissionDenied(doAll(
-                setPermissionDeniedViewVisibility(contactsDeniedView, View.VISIBLE),
-                setPermissionDeniedViewEnabled(contactsButton, false)))
-        .request();
-```
-
-You are free to use the same technique to bundle your own callbacks in a similar 
-MyFavoriteCallbacks class, or to contact me if you think some important common callback handlers 
-are missing from the library.
-
 ### Known issues and limitations
 
 In order to avoid memory leaks, the callbacks (OnPermissionGranted/OnPermissionDenied/
@@ -302,9 +264,7 @@ requesting a permission. For example:
 ```java
     permissionManager.with(Manifest.permission.CAMERA)
         .usingRequestCode(MY_REQUEST_CODE) 
-        .onPermissionGranted(startPermissionGrantedActivity(this, new Intent(this, CameraPreviewActivity.class)))
-        .onPermissionDenied(showPermissionDeniedSnackbar(mLayout, "Camera permission request was denied.", "SETTINGS"))
-        .onPermissionShowRationale(showPermissionShowRationaleSnackbar(mLayout, "Camera access is required to display the camera preview.", "OK"))
+        .onCallback(...)
         .request();
 
     ...
@@ -312,15 +272,13 @@ requesting a permission. For example:
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         boolean handled = permissionManager.handlePermissionResult(requestCode, grantResults);
-        if (handled) {
-            return;
-        }
+        if (handled) return;
 
         switch (requestCode) {
             case MY_REQUEST_CODE:
                 permissionManager.with(Manifest.permission.CAMERA)
-                    .onPermissionGranted(startPermissionGrantedActivity(this, new Intent(this, CameraPreviewActivity.class)))
-                    .onPermissionDenied(showPermissionDeniedSnackbar(mLayout, "Camera permission request was denied.", "SETTINGS"))
+                    .onPermissionGranted(...)
+                    .onPermissionDenied(...)
                     .check();
                  break;
             case MY_OTHER_REQUEST_CODE:
