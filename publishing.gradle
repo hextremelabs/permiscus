@@ -1,4 +1,5 @@
 apply plugin: 'maven'
+apply plugin: 'signing'
 
 /*
 ext {
@@ -63,6 +64,17 @@ def props = { propName, defaultValue = "" ->
     else return System.getenv(propName) ?: defaultValue
 }
 
+gradle.taskGraph.whenReady { taskGraph ->
+    ext["signing.keyId"] = props("signing.keyId")
+    ext["signing.password"] = props("signing.password")
+    ext["signing.secretKeyRingFile"] = props("signing.secretKeyRingFile")
+}
+
+signing {
+    required { !props("nexus.repository").isEmpty() }
+    sign configurations.archives
+}
+
 uploadArchives {
     // Authentication
     def username = props("nexus.username")
@@ -74,12 +86,13 @@ uploadArchives {
     println "Repo URL: $repositoryUrl"
 
     repositories.mavenDeployer {
-        if (repositoryUrl != null) {
+        if (repositoryUrl.isEmpty()) {
+            repository(url: repositories.mavenLocal().url)
+        } else {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
             repository(url: repositoryUrl) {
                 authentication(userName: username, password: password)
             }
-        } else {
-            repository(url: repositories.mavenLocal().url)
         }
 
         pom {
