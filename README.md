@@ -1,4 +1,4 @@
-# permiscus
+# Permiscus
 
 Android runtime permissions were introduced in Android 6.0 Marshmallow. They are unquestionably 
 a boon for Android users, but can be a pain for developers. 
@@ -77,10 +77,10 @@ Maven
 </dependency>
 ```
 
-[Download Latest JAR](https://search.maven.org/remote_content?g=com.hextremelabs.permiscus&a=permiscus&v=LATEST)
+[Download Latest AAR](https://search.maven.org/remote_content?g=com.hextremelabs.permiscus&a=permiscus&v=LATEST&e=aar)
 
 Snapshots of developement versions are available 
-on [Sonatype snapshots repository](https://oss.sonatype.org/content/groups/public/)
+on [Sonatype snapshots repository](https://oss.sonatype.org/content/groups/public/com/hextremelabs/permiscus/permiscus/)
 
 ### Creating a PermissionManager
 
