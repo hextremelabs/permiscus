@@ -60,7 +60,7 @@ public class ContactRequestFragment extends Fragment {
         }
 
         @Override
-        public void onPermissionShowRationale(PermissionRequest permissionRequest) {
+        public void onPermissionShowRationale(@NonNull PermissionRequest permissionRequest) {
             requireFragmentManager().beginTransaction()
               .replace(R.id.fragment_container, new ContactRationaleFragment())
               .commit();

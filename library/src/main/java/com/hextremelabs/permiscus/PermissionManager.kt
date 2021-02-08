@@ -28,7 +28,8 @@ sealed class PermissionManager {
         return true
     }
 
-    fun check(permissionRequest: PermissionRequest) {
+    @JvmSynthetic
+    internal fun check(permissionRequest: PermissionRequest) {
         if (checkPermissions(permissionRequest.permissions)) {
             permissionRequest.fireOnPermissionGrantedCallback()
         } else {
@@ -37,7 +38,8 @@ sealed class PermissionManager {
         }
     }
 
-    fun request(permissionRequest: PermissionRequest) {
+    @JvmSynthetic
+    internal fun request(permissionRequest: PermissionRequest) {
         if (checkPermissions(permissionRequest.permissions)) {
             permissionRequest.fireOnPermissionGrantedCallback()
             return
@@ -49,7 +51,8 @@ sealed class PermissionManager {
         }
     }
 
-    fun requestPermission(permissionRequest: PermissionRequest) {
+    @JvmSynthetic
+    internal fun requestPermission(permissionRequest: PermissionRequest) {
         val requestCode = registerCallbacks(permissionRequest)
         requestPermission(requestCode, permissionRequest.permissions)
     }
