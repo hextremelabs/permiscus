@@ -267,7 +267,7 @@ Email: <nicolai.buch.andersen@gmail.com><br/>
 
 ## License
 
-    Copyright 2016 Hextremelabs Ltd.
+    Copyright 2021 Hextremelabs Ltd.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
