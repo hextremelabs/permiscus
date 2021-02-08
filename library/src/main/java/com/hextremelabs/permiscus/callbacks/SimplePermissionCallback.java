@@ -4,13 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.Settings;
-import android.support.annotation.StringRes;
-import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.Toast;
-
+import com.google.android.material.snackbar.Snackbar;
 import com.hextremelabs.permiscus.PermissionRequest;
 import com.hextremelabs.permiscus.R;
+import androidx.annotation.StringRes;
 
 /**
  * @author ADIO Kingsley O.

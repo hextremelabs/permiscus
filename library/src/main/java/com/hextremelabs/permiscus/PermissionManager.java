@@ -1,10 +1,9 @@
 package com.hextremelabs.permiscus;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.support.annotation.NonNull;
-import android.support.v13.app.FragmentCompat;
-import android.support.v4.app.ActivityCompat;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
 import android.util.SparseArray;
 
 public abstract class PermissionManager {
@@ -19,10 +18,6 @@ public abstract class PermissionManager {
 
     public static PermissionManager create(Fragment fragment) {
         return new FragmentPermissionManager(fragment);
-    }
-
-    public static PermissionManager create(android.support.v4.app.Fragment fragment) {
-        return new SupportFragmentPermissionManager(fragment);
     }
 
     public PermissionRequestBuilder with(@NonNull String... permissions) {
@@ -162,29 +157,6 @@ public abstract class PermissionManager {
 
         @Override
         public void requestPermission(int requestCode, String[] permissions) {
-            FragmentCompat.requestPermissions(fragment, permissions, requestCode);
-        }
-
-        @Override
-        protected boolean checkPermissions(String[] permissions) {
-            return PermissionUtil.checkPermissions(fragment.getActivity(), permissions);
-        }
-
-        @Override
-        protected boolean shouldShowPermissionRationale(String[] permissions) {
-            return PermissionUtil.shouldShowPermissionRationale(fragment, permissions);
-        }
-    }
-
-    private static class SupportFragmentPermissionManager extends PermissionManager {
-        private final @NonNull android.support.v4.app.Fragment fragment;
-
-        public SupportFragmentPermissionManager(@NonNull android.support.v4.app.Fragment fragment) {
-            this.fragment = fragment;
-        }
-
-        @Override
-        protected void requestPermission(int requestCode, String[] permissions) {
             fragment.requestPermissions(permissions, requestCode);
         }
 

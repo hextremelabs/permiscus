@@ -1,18 +1,17 @@
 package com.hextremelabs.permiscus.demo;
 
 import android.Manifest;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-
 import com.hextremelabs.permiscus.PermissionManager;
 import com.hextremelabs.permiscus.callbacks.OnPermissionCallback;
 import com.hextremelabs.permiscus.callbacks.OnPermissionGrantedCallback;
@@ -36,15 +35,10 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
         // Register a listener for the 'Show Camera Preview' button...
         Button b = (Button) findViewById(com.hextremelabs.permiscus.demo.R.id.button_open_camera);
-        b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showCameraPreview();
-            }
-        });
+        b.setOnClickListener(view -> showCameraPreview());
 
         // Setup the contact fragment...
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.fragment_container, new ContactRequestFragment());
         fragmentTransaction.commit();
     }

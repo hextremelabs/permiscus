@@ -1,22 +1,20 @@
 package com.hextremelabs.permiscus.demo.contacts;
 
 import android.Manifest;
-import android.app.Fragment;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v13.app.FragmentCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
 import com.hextremelabs.permiscus.PermissionManager;
 import com.hextremelabs.permiscus.PermissionRequest;
 import com.hextremelabs.permiscus.callbacks.OnPermissionCallback;
 import com.hextremelabs.permiscus.demo.R;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
-public class ContactRequestFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback {
+public class ContactRequestFragment extends Fragment {
     private final PermissionManager permissionManager = PermissionManager.create(this);
 
     private Button contactsButton;
@@ -31,12 +29,7 @@ public class ContactRequestFragment extends Fragment implements FragmentCompat.O
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         contactsButton = (Button) view.findViewById(R.id.button_open_contacts);
-        contactsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showContacts();
-            }
-        });
+        contactsButton.setOnClickListener(view1 -> showContacts());
         contactsDeniedView = view.findViewById(R.id.contacts_permission_denied);
     }
 

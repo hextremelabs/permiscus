@@ -1,15 +1,14 @@
 package com.hextremelabs.permiscus;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.v13.app.FragmentCompat;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.util.SimpleArrayMap;
+import androidx.annotation.NonNull;
+import androidx.collection.SimpleArrayMap;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 class PermissionUtil {
 
@@ -74,19 +73,6 @@ class PermissionUtil {
      * Check if at least one of the given permissions should show a permission rationale.
      */
     static boolean shouldShowPermissionRationale(Fragment fragment, @NonNull String[] permissions) {
-        for (String permission : permissions) {
-            if (FragmentCompat.shouldShowRequestPermissionRationale(fragment, permission)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Check if at least one of the given permissions should show a permission rationale.
-     */
-    static boolean shouldShowPermissionRationale(android.support.v4.app.Fragment fragment, @NonNull String[] permissions) {
         for (String permission : permissions) {
             if (fragment.shouldShowRequestPermissionRationale(permission)) {
                 return true;

@@ -1,10 +1,9 @@
 package com.hextremelabs.permiscus;
 
-import android.support.annotation.NonNull;
-
 import com.hextremelabs.permiscus.callbacks.OnPermissionDeniedCallback;
 import com.hextremelabs.permiscus.callbacks.OnPermissionGrantedCallback;
 import com.hextremelabs.permiscus.callbacks.OnPermissionShowRationaleCallback;
+import androidx.annotation.NonNull;
 
 public class PermissionRequest {
     private final @NonNull PermissionManager permissionManager;
