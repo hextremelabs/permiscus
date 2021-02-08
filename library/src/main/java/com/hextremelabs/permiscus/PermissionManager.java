@@ -1,10 +1,10 @@
 package com.hextremelabs.permiscus;
 
 import android.app.Activity;
+import android.util.SparseArray;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import android.util.SparseArray;
 
 public abstract class PermissionManager {
     private static final int MAX_REQUEST_CODE = 255;

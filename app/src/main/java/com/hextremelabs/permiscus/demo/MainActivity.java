@@ -14,7 +14,6 @@ import android.view.View;
 import android.widget.Button;
 import com.hextremelabs.permiscus.PermissionManager;
 import com.hextremelabs.permiscus.callbacks.OnPermissionCallback;
-import com.hextremelabs.permiscus.callbacks.OnPermissionGrantedCallback;
 import com.hextremelabs.permiscus.callbacks.SimplePermissionCallback;
 import com.hextremelabs.permiscus.demo.camera.CameraPreviewActivity;
 import com.hextremelabs.permiscus.demo.contacts.ContactRequestFragment;
@@ -70,21 +69,15 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         OnPermissionCallback callback = SimplePermissionCallback.with(mLayout)
           .rationale("Camera permission is required to take your pictures")
           .instructions("Open permissions and tap on Camera to enable it")
-          .onPermissionsGranted(new CameraPermissionGrantedCallback())
+          .onPermissionsGranted(() -> {
+              Intent intent = new Intent(MainActivity.this, CameraPreviewActivity.class);
+              startActivity(intent);
+          })
           .create();
 
         permissionManager.with(Manifest.permission.CAMERA)
           .usingRequestCode(PERMISSION_REQUEST_CAMERA)
           .onCallback(callback)
           .request();
-    }
-
-    private class CameraPermissionGrantedCallback implements OnPermissionGrantedCallback {
-
-        @Override
-        public void onPermissionGranted() {
-            Intent intent = new Intent(MainActivity.this, CameraPreviewActivity.class);
-            startActivity(intent);
-        }
     }
 }

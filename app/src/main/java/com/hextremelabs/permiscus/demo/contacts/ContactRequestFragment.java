@@ -54,14 +54,14 @@ public class ContactRequestFragment extends Fragment {
 
         @Override
         public void onPermissionGranted() {
-            getFragmentManager().beginTransaction()
+            requireFragmentManager().beginTransaction()
               .replace(R.id.fragment_container, new ContactResultFragment())
               .commit();
         }
 
         @Override
         public void onPermissionShowRationale(PermissionRequest permissionRequest) {
-            getFragmentManager().beginTransaction()
+            requireFragmentManager().beginTransaction()
               .replace(R.id.fragment_container, new ContactRationaleFragment())
               .commit();
         }

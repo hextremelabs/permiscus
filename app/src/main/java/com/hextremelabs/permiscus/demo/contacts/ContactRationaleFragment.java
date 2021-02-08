@@ -40,7 +40,7 @@ public class ContactRationaleFragment extends Fragment {
     }
 
     private void onCancel() {
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = requireFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, new ContactRequestFragment());
         fragmentTransaction.commit();
     }
@@ -55,14 +55,14 @@ public class ContactRationaleFragment extends Fragment {
 
         @Override
         public void onPermissionDenied(boolean neverAskAgain) {
-            getFragmentManager().beginTransaction()
+            requireFragmentManager().beginTransaction()
               .replace(R.id.fragment_container, new ContactRequestFragment())
               .commit();
         }
 
         @Override
         public void onPermissionGranted() {
-            getFragmentManager().beginTransaction()
+            requireFragmentManager().beginTransaction()
               .replace(R.id.fragment_container, new ContactResultFragment())
               .commit();
         }

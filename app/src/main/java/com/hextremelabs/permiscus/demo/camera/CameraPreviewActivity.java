@@ -40,7 +40,7 @@ public class CameraPreviewActivity extends Activity {
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
         Camera.getCameraInfo(CAMERA_ID, cameraInfo);
 
-        if (mCamera == null || cameraInfo == null) {
+        if (mCamera == null) {
             // Camera is not available, display error message
             Toast.makeText(this, "Camera is not available.", Toast.LENGTH_SHORT).show();
             setContentView(R.layout.activity_camera_unavailable);
