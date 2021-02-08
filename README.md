@@ -28,30 +28,23 @@ of code, almost all dealing with the single permission request.
 
 The same operation using this library is as simple as:
 
-```java
-private final PermissionManager permissionManager = PermissionManager.create(this);
+```kotlin
+private val permissionManager = PermissionManager.create(this)
 
-private void showCameraPreview() {
-    OnPermissionCallback callback = SimplePermissionCallback.with(mLayout)
-      .rationale("Camera permission is required to take your pictures")
-      .instructions("Open permissions and tap on Camera to enable it")
-      .onPermissionsGranted(new OnPermissionGrantedCallback {
-            @Override
-            public void onPermissionGranted() {
-                startActivity(new Intent(this, CameraPreviewActivity.class));
-            }
-        })
-      .create();
-
+private fun showCameraPreview() {
+    val callback = SimplePermissionCallback.with(layout)
+        .rationale("Camera permission is required to take your pictures")
+        .instructions("Open permissions and tap on Camera to enable it")
+        .onPermissionsGranted { startActivity(Intent(this, CameraPreviewActivity::class.java)) }
+        .create()
     permissionManager.with(Manifest.permission.CAMERA)
-      .usingRequestCode(PERMISSION_REQUEST_CAMERA)
-      .onCallback(callback)
-      .request();
+        .usingRequestCode(PERMISSION_REQUEST_CAMERA)
+        .onCallback(callback)
+        .request()
 }
 
-@Override
-public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-    permissionManager.handlePermissionResult(requestCode, grantResults);
+override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    permissionManager.handlePermissionResult(requestCode, grantResults)
 }
 ```
 
@@ -64,7 +57,7 @@ This not only reduces the amount of code by about half, but also greatly improve
 Gradle
 ```gradle
 dependencies {
-    compile 'com.hextremelabs.permiscus:permiscus:0.1.0'
+    implementation 'com.hextremelabs.permiscus:permiscus:0.2.0'
 }
 ```
 
@@ -73,7 +66,7 @@ Maven
 <dependency>
     <groupId>com.hextremelabs.permiscus</groupId>
     <artifactId>permiscus</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 
@@ -90,35 +83,32 @@ instance.
 
 For activities:
 
-```java
-public class MainActivity extends AppCompatActivity 
-    implements ActivityCompat.OnRequestPermissionsResultCallback {
 
-    private final PermissionManager permissionManager = PermissionManager.create(this);
+```kotlin
+class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        permissionManager.handlePermissionResult(requestCode, grantResults);
+    private val permissionManager = PermissionManager.create(this)
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        permissionManager.handlePermissionResult(requestCode, grantResults)
     }
 
-    ...
+    // ...
 }
 ```
 
 For fragments:
 
-```java
-public class ContactRationaleFragment extends Fragment 
-    implements FragmentCompat.OnRequestPermissionsResultCallback {
-    
-    private final PermissionManager permissionManager = PermissionManager.create(this);
+```kotlin
+class ContactRationaleFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallback {
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        permissionManager.handlePermissionResult(requestCode, grantResults);
+    private val permissionManager = PermissionManager.create(this)
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        permissionManager.handlePermissionResult(requestCode, grantResults)
     }
 
-    ...
+    // ...
 }
 ```
 
@@ -129,7 +119,7 @@ leaks in you activities.
 
 A permission request is performed using a syntax inspired by Glide and similar libraries. 
 
-```java
+```kotlin
 // Start building a new request using the with() method. 
 // The method takes either a single permission or a list of permissions.
 // Specify multiple permissions in case you need to request both 
@@ -139,15 +129,15 @@ permissionManager.with(...)
         .usingRequestCode(REQUEST_CODE) 
         
         // Optionally, specify a callback handler for all three callbacks
-        .onCallback(new OnPermissionCallback() {...}) 
+        .onCallback(object : OnPermissionCallback {...})
 
         // OR specify handlers for each callback separately
-        .onPermissionGranted(new OnPermissionGrantedCallback() {...})
-        .onPermissionDenied(new OnPermissionDeniedCallback() {...})
-        .onPermissionShowRationale(new OnPermissionShowRationaleCallback() {...})
+        .onPermissionGranted { ... }
+        .onPermissionDenied { neverAskAgain -> ... }
+        .onPermissionShowRationale { request -> ... }
         
         // Finally, perform the request
-        .request();
+        .request()
 ```
 
 If the app already has the requested permission then the onPermissionGranted callback is invoked
@@ -159,11 +149,11 @@ onPermissionGranted/onPermissionDenied callbacks called once the user has answer
 
 Alternatively, it is also possible to check for the permission 'silently':
 
-```java
+```kotlin
 permissionManager.with(...)
         .onPermissionGranted(...)
         .onPermissionDenied(...)
-        .check();
+        .check()
 ```
 
 The check() method will not ask the user for permission if it is not already granted, 
@@ -175,24 +165,23 @@ invoke either the onPermissionGranted or the onPermissionDenied callback at once
 The callbacks are simple single methods interfaces - with the exception of the aggregate 
 OnPermissionCallback interface:
 
-```java
-public interface OnPermissionGrantedCallback {
-    void onPermissionGranted();
+```kotlin
+fun interface OnPermissionDeniedCallback {
+    fun onPermissionDenied(neverAskAgain: Boolean)
 }
 
-public interface OnPermissionDeniedCallback {
-    void onPermissionDenied(boolean neverAskAgain);
+fun interface OnPermissionGrantedCallback {
+    fun onPermissionGranted()
 }
 
-public interface OnPermissionShowRationaleCallback {
-    void onPermissionShowRationale(PermissionRequest permissionRequest);
+fun interface OnPermissionShowRationaleCallback {
+    fun onPermissionShowRationale(permissionRequest: PermissionRequest)
 }
 
-public interface OnPermissionCallback extends 
-    OnPermissionGrantedCallback, 
-    OnPermissionDeniedCallback, 
-    OnPermissionShowRationaleCallback {
-}
+interface OnPermissionCallback :
+    OnPermissionGrantedCallback,
+    OnPermissionDeniedCallback,
+    OnPermissionShowRationaleCallback
 ```
 
 When the onPermissionShowRationale callback is called, the app is expected to show some kind of 
@@ -205,16 +194,11 @@ single public method. This method lets the permission manager know that the user
 rationale. If the rationale is accepted then the permission manager automatically tries to request 
 the permission again. 
 
-```java           
-void onPermissionShowRationale(PermissionRequest permissionRequest) {
+```kotlin
+override fun onPermissionShowRationale(permissionRequest: PermissionRequest) {
     ...
     
-    okButton.OnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            permissionRequest.acceptPermissionRationale();
-        }
-    });
+    okButton.setOnClickListener { permissionRequest.acceptPermissionRationale() }
 }
 ```
 
@@ -246,29 +230,26 @@ to ensure that the proper callback is still invoked. This, unfortunately, involv
 code duplication and for you to set the request codes by calling usingRequestCode(...) when
 requesting a permission. For example:
 
-```java
+```kotlin
     permissionManager.with(Manifest.permission.CAMERA)
         .usingRequestCode(MY_REQUEST_CODE) 
         .onCallback(...)
-        .request();
+        .request()
 
     ...
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        boolean handled = permissionManager.handlePermissionResult(requestCode, grantResults);
-        if (handled) return;
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        val handled = permissionManager.handlePermissionResult(requestCode, grantResults)
+        if (handled) return
 
-        switch (requestCode) {
-            case MY_REQUEST_CODE:
+        when (requestCode) {
+            MY_REQUEST_CODE ->
                 permissionManager.with(Manifest.permission.CAMERA)
                     .onPermissionGranted(...)
                     .onPermissionDenied(...)
-                    .check();
-                 break;
-            case MY_OTHER_REQUEST_CODE:
+                    .check()
+            MY_OTHER_REQUEST_CODE ->
                 ...
-                break;
         }
     }
 ```
