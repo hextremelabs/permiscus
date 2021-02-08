@@ -1,19 +1,19 @@
 package com.hextremelabs.permiscus.demo.contacts;
 
-import android.app.Fragment;
-import android.app.LoaderManager;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import com.hextremelabs.permiscus.demo.R;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
 
 public class ContactResultFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     /**
@@ -31,7 +31,7 @@ public class ContactResultFragment extends Fragment implements LoaderManager.Loa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getLoaderManager().restartLoader(0, null, this);
+        LoaderManager.getInstance(this).restartLoader(0, null, this);
     }
 
     @Nullable
@@ -45,13 +45,14 @@ public class ContactResultFragment extends Fragment implements LoaderManager.Loa
         resultView = (TextView) view.findViewById(R.id.contact_result);
     }
 
+    @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(getActivity(), ContactsContract.Contacts.CONTENT_URI, PROJECTION, null, null, ORDER);
+        return new CursorLoader(requireActivity(), ContactsContract.Contacts.CONTENT_URI, PROJECTION, null, null, ORDER);
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
         if (cursor != null) {
             final int totalCount = cursor.getCount();
             if (totalCount > 0) {
@@ -65,7 +66,7 @@ public class ContactResultFragment extends Fragment implements LoaderManager.Loa
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
         resultView.setText(R.string.contacts_empty);
     }
 }

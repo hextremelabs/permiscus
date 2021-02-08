@@ -1,4 +1,4 @@
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 /*
@@ -32,7 +32,7 @@ $ gradle uploadArchives
 
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
+    archiveClassifier.set('sources')
 }
 
 task javadoc(type: Javadoc) {
@@ -42,13 +42,8 @@ task javadoc(type: Javadoc) {
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    archiveClassifier.set('javadoc')
     from javadoc.destinationDir
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
 }
 
 def localProperties = new Properties()
@@ -70,53 +65,56 @@ gradle.taskGraph.whenReady { taskGraph ->
     ext["signing.secretKeyRingFile"] = props("signing.secretKeyRingFile")
 }
 
-signing {
-    required { !props("nexus.repository").isEmpty() }
-    sign configurations.archives
-}
+afterEvaluate {
+    publishing {
+        repositories {
+            def repositoryUrl = props("nexus.repository")
+            if (!repositoryUrl.isEmpty()) {
+                maven {
+                    url = repositoryUrl
+                    credentials {
+                        username props("nexus.username")
+                        password props("nexus.password")
 
-uploadArchives {
-    // Authentication
-    def username = props("nexus.username")
-    def password = props("nexus.password")
-    def repositoryUrl = props("nexus.repository")
-
-    println "Project: $project.path"
-    println "Username: $username"
-    println "Repo URL: $repositoryUrl"
-
-    repositories.mavenDeployer {
-        if (repositoryUrl.isEmpty()) {
-            repository(url: repositories.mavenLocal().url)
-        } else {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-            repository(url: repositoryUrl) {
-                authentication(userName: username, password: password)
+                        println "Project: $project.path"
+                        println "Username: $username"
+                        println "Repo URL: $repositoryUrl"
+                    }
+                }
             }
         }
+        publications {
+            release(MavenPublication) {
+                from components.release
+                artifact javadocJar
+                artifact sourcesJar
 
-        pom {
-            groupId = pomGroupId
-            artifactId = pomArtifactId
-            version = pomVersion
-        }
+                groupId = pomGroupId
+                artifactId = pomArtifactId
+                version = pomVersion
+                pom {
+                    name.set(pomArtifactName)
+                    description.set(pomArtifactDescription)
+                    url.set(pomSiteUrl)
 
-        pom.project {
-            packaging 'aar'
+                    licenses(pomLicenses)
+                    developers(pomDevelopers)
 
-            name pomArtifactName
-            description pomArtifactDescription
-
-            url pomSiteUrl
-
-            licenses(pomLicenses)
-            developers(pomDevelopers)
-
-            scm {
-                connection = pomGitUrl
-                developerConnection = pomGitUrl
-                url = pomSiteUrl
+                    scm {
+                        connection.set(pomGitUrl)
+                        developerConnection.set(pomGitUrl)
+                        url.set(pomSiteUrl)
+                    }
+                }
             }
         }
+    }
+
+    signing {
+        //required { !props("nexus.repository").isEmpty() }
+        sign publishing.publications.release
+    }
+    tasks.withType(Sign) {
+        onlyIf { !props("nexus.repository").isEmpty() }
     }
 }

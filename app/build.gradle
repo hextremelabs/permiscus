@@ -1,28 +1,26 @@
 apply plugin: 'com.android.application'
 
 dependencies {
-    //compile 'com.hextremelabs.permiscus:permiscus:1.0.0'
-    compile project(":permiscus")
-    compile libraries.support_annotations
-    compile libraries.support_appcompat
-    compile libraries.support_design
+    implementation project(":permiscus")
+    implementation libraries.androidxAnnotations
+    implementation libraries.androidxAppCompat
+    implementation libraries.googleMaterial
 }
 
 android {
     compileSdkVersion versions.compileSdkVersion
-    buildToolsVersion versions.buildToolsVersion
 
     defaultConfig {
         applicationId 'com.hextremelabs.permiscus.demo'
         minSdkVersion versions.minSdkVersion
         targetSdkVersion versions.targetSdkVersion
 
-        versionCode versions.versionCode
-        versionName versions.versionName
+        versionCode 1
+        versionName "1.0"
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
