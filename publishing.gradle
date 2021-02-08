@@ -67,23 +67,23 @@ gradle.taskGraph.whenReady { taskGraph ->
 
 afterEvaluate {
     publishing {
-        def username = props("nexus.username")
-        def password = props("nexus.password")
-        def repositoryUrl = props("nexus.repository")
-        if (!repositoryUrl.isEmpty()) {
-            maven {
-                url = uri(repositoryUrl)
-                credentials {
-                    username username
-                    password password
+        repositories {
+            def repositoryUrl = props("nexus.repository")
+            if (!repositoryUrl.isEmpty()) {
+                maven {
+                    url = repositoryUrl
+                    credentials {
+                        username props("nexus.username")
+                        password props("nexus.password")
+
+                        println "Project: $project.path"
+                        println "Username: $username"
+                        println "Repo URL: $repositoryUrl"
+                    }
                 }
             }
         }
         publications {
-            println "Project: $project.path"
-            println "Username: $username"
-            println "Repo URL: $repositoryUrl"
-
             release(MavenPublication) {
                 from components.release
                 artifact javadocJar
