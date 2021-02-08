@@ -1,59 +1,57 @@
-package com.hextremelabs.permiscus;
+package com.hextremelabs.permiscus
 
-import com.hextremelabs.permiscus.callbacks.OnPermissionCallback;
-import com.hextremelabs.permiscus.callbacks.OnPermissionDeniedCallback;
-import com.hextremelabs.permiscus.callbacks.OnPermissionGrantedCallback;
-import com.hextremelabs.permiscus.callbacks.OnPermissionShowRationaleCallback;
-import androidx.annotation.NonNull;
+import com.hextremelabs.permiscus.callbacks.OnPermissionCallback
+import com.hextremelabs.permiscus.callbacks.OnPermissionDeniedCallback
+import com.hextremelabs.permiscus.callbacks.OnPermissionGrantedCallback
+import com.hextremelabs.permiscus.callbacks.OnPermissionShowRationaleCallback
 
-public class PermissionRequestBuilder {
-    private final @NonNull PermissionManager manager;
-    private final @NonNull String[] permissions;
-    private int requestCode = -1;
+class PermissionRequestBuilder internal constructor(
+    private val manager: PermissionManager,
+    private val permissions: Array<String>
+) {
+    private var requestCode = -1
+    private var grantedCallback: OnPermissionGrantedCallback? = null
+    private var deniedCallback: OnPermissionDeniedCallback? = null
+    private var showRationaleCallback: OnPermissionShowRationaleCallback? = null
 
-    private OnPermissionGrantedCallback grantedCallback;
-    private OnPermissionDeniedCallback deniedCallback;
-    private OnPermissionShowRationaleCallback showRationaleCallback;
-
-    PermissionRequestBuilder(@NonNull PermissionManager manager, @NonNull String[] permissions) {
-        this.manager = manager;
-        this.permissions = permissions;
+    fun usingRequestCode(requestCode: Int): PermissionRequestBuilder {
+        this.requestCode = requestCode
+        return this
     }
 
-    public PermissionRequestBuilder usingRequestCode(int requestCode) {
-        this.requestCode = requestCode;
-        return this;
+    fun onCallback(callback: OnPermissionCallback): PermissionRequestBuilder {
+        grantedCallback = callback
+        deniedCallback = callback
+        showRationaleCallback = callback
+        return this
     }
 
-    public PermissionRequestBuilder onCallback(OnPermissionCallback callback) {
-        this.grantedCallback = callback;
-        this.deniedCallback = callback;
-        this.showRationaleCallback = callback;
-        return this;
+    fun onPermissionGranted(callback: OnPermissionGrantedCallback): PermissionRequestBuilder {
+        grantedCallback = callback
+        return this
     }
 
-    public PermissionRequestBuilder onPermissionGranted(OnPermissionGrantedCallback callback) {
-        this.grantedCallback = callback;
-        return this;
+    fun onPermissionDenied(callback: OnPermissionDeniedCallback): PermissionRequestBuilder {
+        deniedCallback = callback
+        return this
     }
 
-    public PermissionRequestBuilder onPermissionDenied(OnPermissionDeniedCallback callback) {
-        this.deniedCallback = callback;
-        return this;
+    fun onPermissionShowRationale(callback: OnPermissionShowRationaleCallback): PermissionRequestBuilder {
+        showRationaleCallback = callback
+        return this
     }
 
-    public PermissionRequestBuilder onPermissionShowRationale(OnPermissionShowRationaleCallback callback) {
-        this.showRationaleCallback = callback;
-        return this;
+    fun request() {
+        val permissionRequest = PermissionRequest(
+            manager, permissions, requestCode, grantedCallback, deniedCallback, showRationaleCallback
+        )
+        manager.request(permissionRequest)
     }
 
-    public void request() {
-        PermissionRequest permissionRequest = new PermissionRequest(manager, permissions, requestCode, grantedCallback, deniedCallback, showRationaleCallback);
-        manager.request(permissionRequest);
-    }
-
-    public void check() {
-        PermissionRequest permissionRequest = new PermissionRequest(manager, permissions, requestCode, grantedCallback, deniedCallback, showRationaleCallback);
-        manager.check(permissionRequest);
+    fun check() {
+        val permissionRequest = PermissionRequest(
+            manager, permissions, requestCode, grantedCallback, deniedCallback, showRationaleCallback
+        )
+        manager.check(permissionRequest)
     }
 }

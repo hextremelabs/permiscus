@@ -1,57 +1,30 @@
-package com.hextremelabs.permiscus;
+package com.hextremelabs.permiscus
 
-import com.hextremelabs.permiscus.callbacks.OnPermissionDeniedCallback;
-import com.hextremelabs.permiscus.callbacks.OnPermissionGrantedCallback;
-import com.hextremelabs.permiscus.callbacks.OnPermissionShowRationaleCallback;
-import androidx.annotation.NonNull;
+import com.hextremelabs.permiscus.callbacks.OnPermissionDeniedCallback
+import com.hextremelabs.permiscus.callbacks.OnPermissionGrantedCallback
+import com.hextremelabs.permiscus.callbacks.OnPermissionShowRationaleCallback
 
-public class PermissionRequest {
-    private final @NonNull PermissionManager permissionManager;
-
-    private final @NonNull String[] permissions;
-    private final int requestCode;
-
-    protected final OnPermissionGrantedCallback grantedCallback;
-    protected final OnPermissionDeniedCallback deniedCallback;
-    protected final OnPermissionShowRationaleCallback showRationaleCallback;
-
-    public PermissionRequest(@NonNull PermissionManager permissionManager, @NonNull String[] permissions, int requestCode, OnPermissionGrantedCallback grantedCallback, OnPermissionDeniedCallback deniedCallback, OnPermissionShowRationaleCallback showRationaleCallback) {
-        this.permissionManager = permissionManager;
-        this.permissions = permissions;
-        this.requestCode = requestCode;
-        this.grantedCallback = grantedCallback;
-        this.deniedCallback = deniedCallback;
-        this.showRationaleCallback = showRationaleCallback;
+class PermissionRequest(
+    private val permissionManager: PermissionManager,
+    val permissions: Array<String>,
+    val requestCode: Int,
+    private val grantedCallback: OnPermissionGrantedCallback?,
+    private val deniedCallback: OnPermissionDeniedCallback?,
+    private val showRationaleCallback: OnPermissionShowRationaleCallback?
+) {
+    fun acceptPermissionRationale() {
+        permissionManager.requestPermission(this)
     }
 
-    public void acceptPermissionRationale() {
-        permissionManager.requestPermission(this);
+    fun fireOnPermissionGrantedCallback() {
+        grantedCallback?.onPermissionGranted()
     }
 
-    @NonNull
-    protected String[] getPermissions() {
-        return permissions;
+    fun fireOnPermissionDeniedCallback(neverAskAgain: Boolean) {
+        deniedCallback?.onPermissionDenied(neverAskAgain)
     }
 
-    protected int getRequestCode() {
-        return requestCode;
-    }
-
-    protected void fireOnPermissionGrantedCallback() {
-        if (grantedCallback != null) {
-            grantedCallback.onPermissionGranted();
-        }
-    }
-
-    protected void fireOnPermissionDeniedCallback(boolean neverAskAgain) {
-        if (deniedCallback != null) {
-            deniedCallback.onPermissionDenied(neverAskAgain);
-        }
-    }
-
-    protected void fireOnPermissionShowRationaleCallback() {
-        if (showRationaleCallback != null) {
-            showRationaleCallback.onPermissionShowRationale(this);
-        }
+    fun fireOnPermissionShowRationaleCallback() {
+        showRationaleCallback?.onPermissionShowRationale(this)
     }
 }

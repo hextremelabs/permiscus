@@ -1,112 +1,93 @@
-package com.hextremelabs.permiscus;
+package com.hextremelabs.permiscus
 
-import android.app.Activity;
-import android.util.SparseArray;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
+import android.app.Activity
+import android.util.SparseArray
+import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
 
-public abstract class PermissionManager {
-    private static final int MAX_REQUEST_CODE = 255;
+sealed class PermissionManager {
+    private val requestCodeLock = Any()
+    private val requests = SparseArray<PermissionRequest>()
 
-    private final Object requestCodeLock = new Object();
-    private final SparseArray<PermissionRequest> requests = new SparseArray<>();
-
-    public static PermissionManager create(Activity activity) {
-        return new ActivityPermissionManager(activity);
+    fun with(vararg permissions: String): PermissionRequestBuilder {
+        require(permissions.isNotEmpty()) { "Must be called with at least one permission" }
+        @Suppress("UNCHECKED_CAST")
+        return PermissionRequestBuilder(this, permissions as Array<String>)
     }
 
-    public static PermissionManager create(Fragment fragment) {
-        return new FragmentPermissionManager(fragment);
-    }
+    fun handlePermissionResult(requestCode: Int, grantResults: IntArray): Boolean {
+        val request = requests[requestCode] ?: return false
+        unregisterCallbacks(requestCode)
 
-    public PermissionRequestBuilder with(@NonNull String... permissions) {
-        if (permissions.length < 1) {
-            throw new IllegalArgumentException("PermissionManager.with(String... permissions) must be called with at least one permission");
-        }
-
-        return new PermissionRequestBuilder(this, permissions);
-    }
-
-    public boolean handlePermissionResult(int requestCode, @NonNull int[] grantResults) {
-        PermissionRequest request = requests.get(requestCode);
-        unregisterCallbacks(requestCode);
-
-        // If no request callbacks could be found then return false...
-        if (request == null) {
-            return false;
-        }
-
-        // Else execute the appropriate callback...
         if (PermissionUtil.verifyPermissionResults(grantResults)) {
-            request.fireOnPermissionGrantedCallback();
+            request.fireOnPermissionGrantedCallback()
         } else {
-            boolean canShowRationale = shouldShowPermissionRationale(request.getPermissions());
-            request.fireOnPermissionDeniedCallback(!canShowRationale);
+            val canShowRationale = shouldShowPermissionRationale(request.permissions)
+            request.fireOnPermissionDeniedCallback(!canShowRationale)
         }
-
-        return true;
+        return true
     }
 
-    protected void check(PermissionRequest permissionRequest) {
-        if (checkPermissions(permissionRequest.getPermissions())) {
-            permissionRequest.fireOnPermissionGrantedCallback();
+    fun check(permissionRequest: PermissionRequest) {
+        if (checkPermissions(permissionRequest.permissions)) {
+            permissionRequest.fireOnPermissionGrantedCallback()
         } else {
-            boolean canShowRationale = shouldShowPermissionRationale(permissionRequest.getPermissions());
-            permissionRequest.fireOnPermissionDeniedCallback(!canShowRationale);
+            val canShowRationale = shouldShowPermissionRationale(permissionRequest.permissions)
+            permissionRequest.fireOnPermissionDeniedCallback(!canShowRationale)
         }
     }
 
-    protected void request(PermissionRequest permissionRequest) {
-        if (checkPermissions(permissionRequest.getPermissions())) {
-            permissionRequest.fireOnPermissionGrantedCallback();
-            return;
+    fun request(permissionRequest: PermissionRequest) {
+        if (checkPermissions(permissionRequest.permissions)) {
+            permissionRequest.fireOnPermissionGrantedCallback()
+            return
         }
-
-        if (shouldShowPermissionRationale(permissionRequest.getPermissions())) {
-            permissionRequest.fireOnPermissionShowRationaleCallback();
+        if (shouldShowPermissionRationale(permissionRequest.permissions)) {
+            permissionRequest.fireOnPermissionShowRationaleCallback()
         } else {
-            requestPermission(permissionRequest);
+            requestPermission(permissionRequest)
         }
     }
 
-    protected void requestPermission(PermissionRequest permissionRequest) {
-        int requestCode = registerCallbacks(permissionRequest);
-        requestPermission(requestCode, permissionRequest.getPermissions());
+    fun requestPermission(permissionRequest: PermissionRequest) {
+        val requestCode = registerCallbacks(permissionRequest)
+        requestPermission(requestCode, permissionRequest.permissions)
     }
 
-    protected abstract void requestPermission(int requestCode, String[] permissions);
-    protected abstract boolean checkPermissions(String[] permissions);
-    protected abstract boolean shouldShowPermissionRationale(String[] permissions);
+    protected abstract fun requestPermission(requestCode: Int, permissions: Array<String>)
+    protected abstract fun checkPermissions(permissions: Array<String>): Boolean
+    protected abstract fun shouldShowPermissionRationale(permissions: Array<String>): Boolean
 
-    private void unregisterCallbacks(int requestCode) {
-        requests.delete(requestCode);
+    private fun unregisterCallbacks(requestCode: Int) {
+        requests.delete(requestCode)
     }
 
-    private int registerCallbacks(PermissionRequest permissionRequest) {
+    private fun registerCallbacks(permissionRequest: PermissionRequest): Int {
         // Register the request with the PermissionManager before requesting the permission(s).
         // The requests map is used by PermissionManager.handlePermissionResult() to act
         // on the permission result, once the user replies to the request.
         // If the activity/fragment is destroyed before the result arrives
         // then the requests map is lost and the library will instead try to
         // restore the callbacks from one of the static callback maps...
-        int requestCode;
-        synchronized (requestCodeLock) {
+        var requestCode: Int
+        synchronized(requestCodeLock) {
+
             // If no request code was supplied by the PermissionRequestBuilder then
             // calculate one...
-            int userSuppliedRequestCode = permissionRequest.getRequestCode();
-            if (userSuppliedRequestCode == -1) {
-                requestCode = calculateRequestCode();
-                requests.put(requestCode, permissionRequest);
-            } else if (requests.get(userSuppliedRequestCode) == null) {
-                requestCode = userSuppliedRequestCode;
-                requests.put(requestCode, permissionRequest);
-            } else {
-                throw new IllegalStateException("The requestCode " + userSuppliedRequestCode + " is already in use");
+            val userSuppliedRequestCode = permissionRequest.requestCode
+            when {
+                userSuppliedRequestCode == -1 -> {
+                    requestCode = calculateRequestCode()
+                    requests.put(requestCode, permissionRequest)
+                }
+                requests[userSuppliedRequestCode] == null -> {
+                    requestCode = userSuppliedRequestCode
+                    requests.put(requestCode, permissionRequest)
+                }
+                else -> error("The requestCode $userSuppliedRequestCode is already in use")
             }
         }
-
-        return requestCode;
+        return requestCode
     }
 
     /**
@@ -115,60 +96,54 @@ public abstract class PermissionManager {
      * that is not in use.
      * @return an unused request code
      */
-    private int calculateRequestCode() {
-        for (int i = 0; i < MAX_REQUEST_CODE; i++) {
-            if (requests.get(i) == null) {
-                return i;
+    private fun calculateRequestCode(): Int {
+        for (i in 0 until MAX_REQUEST_CODE) {
+            if (requests[i] == null) {
+                return i
             }
         }
-
-        throw new IllegalStateException("Unable to calculate request code. Try setting a request code manually by calling PermissionRequestBuilder#usingRequestCode(int)");
+        error("Unable to calculate request code. Try setting a request code manually by calling PermissionRequestBuilder#usingRequestCode(int)")
     }
 
-    private static class ActivityPermissionManager extends PermissionManager {
-        private final @NonNull Activity activity;
+    private class ActivityPermissionManager(private val activity: Activity) : PermissionManager() {
 
-        public ActivityPermissionManager(@NonNull Activity activity) {
-            this.activity = activity;
+        override fun requestPermission(requestCode: Int, permissions: Array<String>) {
+            ActivityCompat.requestPermissions(activity, permissions, requestCode)
         }
 
-        @Override
-        public void requestPermission(int requestCode, String[] permissions) {
-            ActivityCompat.requestPermissions(activity, permissions, requestCode);
+        override fun checkPermissions(permissions: Array<String>): Boolean {
+            return PermissionUtil.checkPermissions(activity, permissions)
         }
 
-        @Override
-        protected boolean checkPermissions(String[] permissions) {
-            return PermissionUtil.checkPermissions(activity, permissions);
-        }
-
-        @Override
-        protected boolean shouldShowPermissionRationale(String[] permissions) {
-            return PermissionUtil.shouldShowPermissionRationale(activity, permissions);
+        override fun shouldShowPermissionRationale(permissions: Array<String>): Boolean {
+            return PermissionUtil.shouldShowPermissionRationale(activity, permissions)
         }
     }
 
-    private static class FragmentPermissionManager extends PermissionManager {
-        private final @NonNull Fragment fragment;
+    private class FragmentPermissionManager(private val fragment: Fragment) : PermissionManager() {
 
-        public FragmentPermissionManager(@NonNull Fragment fragment) {
-            this.fragment = fragment;
+        override fun requestPermission(requestCode: Int, permissions: Array<String>) {
+            fragment.requestPermissions(permissions, requestCode)
         }
 
-        @Override
-        public void requestPermission(int requestCode, String[] permissions) {
-            fragment.requestPermissions(permissions, requestCode);
+        override fun checkPermissions(permissions: Array<String>): Boolean {
+            return PermissionUtil.checkPermissions(fragment.requireActivity(), permissions)
         }
 
-        @Override
-        protected boolean checkPermissions(String[] permissions) {
-            return PermissionUtil.checkPermissions(fragment.getActivity(), permissions);
-        }
-
-        @Override
-        protected boolean shouldShowPermissionRationale(String[] permissions) {
-            return PermissionUtil.shouldShowPermissionRationale(fragment, permissions);
+        override fun shouldShowPermissionRationale(permissions: Array<String>): Boolean {
+            return PermissionUtil.shouldShowPermissionRationale(fragment, permissions)
         }
     }
 
+    companion object {
+        private const val MAX_REQUEST_CODE = 255
+
+        @JvmStatic fun create(activity: Activity): PermissionManager {
+            return ActivityPermissionManager(activity)
+        }
+
+        @JvmStatic fun create(fragment: Fragment): PermissionManager {
+            return FragmentPermissionManager(fragment)
+        }
+    }
 }

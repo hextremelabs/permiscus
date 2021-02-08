@@ -1,4 +1,20 @@
-package com.hextremelabs.permiscus.callbacks;
+package com.hextremelabs.permiscus.callbacks
 
-public interface OnPermissionCallback extends OnPermissionGrantedCallback, OnPermissionDeniedCallback, OnPermissionShowRationaleCallback {
+import com.hextremelabs.permiscus.PermissionRequest
+
+fun interface OnPermissionDeniedCallback {
+    fun onPermissionDenied(neverAskAgain: Boolean)
 }
+
+fun interface OnPermissionGrantedCallback {
+    fun onPermissionGranted()
+}
+
+fun interface OnPermissionShowRationaleCallback {
+    fun onPermissionShowRationale(permissionRequest: PermissionRequest)
+}
+
+interface OnPermissionCallback :
+    OnPermissionGrantedCallback,
+    OnPermissionDeniedCallback,
+    OnPermissionShowRationaleCallback
