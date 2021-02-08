@@ -30,26 +30,21 @@ apply from: 'publishing.gradle'
 $ gradle uploadArchives
 */
 
-//task sourcesJar(type: Jar) {
-//    from android.sourceSets.main.java.srcDirs
-//    archiveClassifier.set('sources')
-//}
-//
-//task javadoc(type: Javadoc) {
-//    source = android.sourceSets.main.java.srcDirs
-//    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-//    failOnError false
-//}
-//
-//task javadocJar(type: Jar, dependsOn: javadoc) {
-//    archiveClassifier.set('javadoc')
-//    from javadoc.destinationDir
-//}
-//
-//artifacts {
-//    archives javadocJar
-//    archives sourcesJar
-//}
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    archiveClassifier.set('sources')
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    failOnError false
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier.set('javadoc')
+    from javadoc.destinationDir
+}
 
 def localProperties = new Properties()
 def localFile = rootProject.file("local.properties")
@@ -72,21 +67,32 @@ gradle.taskGraph.whenReady { taskGraph ->
 
 afterEvaluate {
     publishing {
+        def username = props("nexus.username")
+        def password = props("nexus.password")
+        def repositoryUrl = props("nexus.repository")
+        if (!repositoryUrl.isEmpty()) {
+            maven {
+                url = uri(repositoryUrl)
+                credentials {
+                    username username
+                    password password
+                }
+            }
+        }
         publications {
-//            println "Project: $project.path"
-//            println "Username: $username"
-//            println "Repo URL: $repositoryUrl"
+            println "Project: $project.path"
+            println "Username: $username"
+            println "Repo URL: $repositoryUrl"
 
             release(MavenPublication) {
                 from components.release
+                artifact javadocJar
+                artifact sourcesJar
 
                 groupId = pomGroupId
                 artifactId = pomArtifactId
                 version = pomVersion
-                //beforeDeployment { deployment -> signing.signPom(deployment) }
                 pom {
-                    //packaging.set('aar')
-
                     name.set(pomArtifactName)
                     description.set(pomArtifactDescription)
                     url.set(pomSiteUrl)
@@ -102,23 +108,13 @@ afterEvaluate {
                 }
             }
         }
-        // Authentication
-        def username = props("nexus.username")
-        def password = props("nexus.password")
-        def repositoryUrl = props("nexus.repository")
-        if (!repositoryUrl.isEmpty()) {
-            maven {
-                url = uri(repositoryUrl)
-                credentials {
-                    username username
-                    password password
-                }
-            }
-        }
     }
 
     signing {
-        required { !props("nexus.repository").isEmpty() }
+        //required { !props("nexus.repository").isEmpty() }
         sign publishing.publications.release
+    }
+    tasks.withType(Sign) {
+        onlyIf { !props("nexus.repository").isEmpty() }
     }
 }

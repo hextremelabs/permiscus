@@ -20,7 +20,7 @@ android {
 }
 
 ext {
-    pomVersion = versions.versionName
+    pomVersion = "0.2.0-SNAPSHOT"
     pomGroupId = 'com.hextremelabs.permiscus'
     pomArtifactId = 'permiscus'
     pomArtifactName = 'Android Permissions Manager'
