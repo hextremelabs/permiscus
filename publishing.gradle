@@ -1,4 +1,4 @@
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 /*
@@ -30,26 +30,26 @@ apply from: 'publishing.gradle'
 $ gradle uploadArchives
 */
 
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    failOnError false
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
+//task sourcesJar(type: Jar) {
+//    from android.sourceSets.main.java.srcDirs
+//    archiveClassifier.set('sources')
+//}
+//
+//task javadoc(type: Javadoc) {
+//    source = android.sourceSets.main.java.srcDirs
+//    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+//    failOnError false
+//}
+//
+//task javadocJar(type: Jar, dependsOn: javadoc) {
+//    archiveClassifier.set('javadoc')
+//    from javadoc.destinationDir
+//}
+//
+//artifacts {
+//    archives javadocJar
+//    archives sourcesJar
+//}
 
 def localProperties = new Properties()
 def localFile = rootProject.file("local.properties")
@@ -70,53 +70,55 @@ gradle.taskGraph.whenReady { taskGraph ->
     ext["signing.secretKeyRingFile"] = props("signing.secretKeyRingFile")
 }
 
-signing {
-    required { !props("nexus.repository").isEmpty() }
-    sign configurations.archives
-}
+afterEvaluate {
+    publishing {
+        publications {
+//            println "Project: $project.path"
+//            println "Username: $username"
+//            println "Repo URL: $repositoryUrl"
 
-uploadArchives {
-    // Authentication
-    def username = props("nexus.username")
-    def password = props("nexus.password")
-    def repositoryUrl = props("nexus.repository")
+            release(MavenPublication) {
+                from components.release
 
-    println "Project: $project.path"
-    println "Username: $username"
-    println "Repo URL: $repositoryUrl"
+                groupId = pomGroupId
+                artifactId = pomArtifactId
+                version = pomVersion
+                //beforeDeployment { deployment -> signing.signPom(deployment) }
+                pom {
+                    //packaging.set('aar')
 
-    repositories.mavenDeployer {
-        if (repositoryUrl.isEmpty()) {
-            repository(url: repositories.mavenLocal().url)
-        } else {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-            repository(url: repositoryUrl) {
-                authentication(userName: username, password: password)
+                    name.set(pomArtifactName)
+                    description.set(pomArtifactDescription)
+                    url.set(pomSiteUrl)
+
+                    licenses(pomLicenses)
+                    developers(pomDevelopers)
+
+                    scm {
+                        connection.set(pomGitUrl)
+                        developerConnection.set(pomGitUrl)
+                        url.set(pomSiteUrl)
+                    }
+                }
             }
         }
-
-        pom {
-            groupId = pomGroupId
-            artifactId = pomArtifactId
-            version = pomVersion
-        }
-
-        pom.project {
-            packaging 'aar'
-
-            name pomArtifactName
-            description pomArtifactDescription
-
-            url pomSiteUrl
-
-            licenses(pomLicenses)
-            developers(pomDevelopers)
-
-            scm {
-                connection = pomGitUrl
-                developerConnection = pomGitUrl
-                url = pomSiteUrl
+        // Authentication
+        def username = props("nexus.username")
+        def password = props("nexus.password")
+        def repositoryUrl = props("nexus.repository")
+        if (!repositoryUrl.isEmpty()) {
+            maven {
+                url = uri(repositoryUrl)
+                credentials {
+                    username username
+                    password password
+                }
             }
         }
+    }
+
+    signing {
+        required { !props("nexus.repository").isEmpty() }
+        sign publishing.publications.release
     }
 }
