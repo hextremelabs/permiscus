@@ -16,15 +16,15 @@ class PermissionRequest(
         permissionManager.requestPermission(this)
     }
 
-    fun fireOnPermissionGrantedCallback() {
+    internal fun fireOnPermissionGrantedCallback() {
         grantedCallback?.onPermissionGranted()
     }
 
-    fun fireOnPermissionDeniedCallback(neverAskAgain: Boolean) {
+    internal fun fireOnPermissionDeniedCallback(neverAskAgain: Boolean) {
         deniedCallback?.onPermissionDenied(neverAskAgain)
     }
 
-    fun fireOnPermissionShowRationaleCallback() {
+    internal fun fireOnPermissionShowRationaleCallback() {
         showRationaleCallback?.onPermissionShowRationale(this)
     }
 }
